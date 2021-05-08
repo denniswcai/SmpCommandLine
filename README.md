@@ -7,7 +7,9 @@ SmpCommandLine is a light-weight header-file-only tool used to parse and extract
 
   # SmpCommandLine is a light-weight header-file-only tool used to parse and extract arguments from command line.
 
-    You may check the example codes below for quick usage.
+    There are many open source command line parsers, but this one is easy to use.
+    
+    You may check the example codes below for a quick start.
 
     There are two kinds of arguments in command line: Flagged Arguments and Unflagged Arguments.
     A Flagged Argument starts with a hyphen sign followed by one character (eg: -n, referred to as  
