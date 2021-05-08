@@ -3,10 +3,9 @@ SmpCommandLine is a light-weight header-file-only tool used to parse and extract
 
 // SmpCommandLine.hpp
 // Dennis @ 2021-05
-### Descriptions: SmpCommandLine (V0.5)
+# Descriptions: SmpCommandLine (V0.5)
 
-  # SmpCommandLine is a light-weight header-file-only tool used to parse and extract arguments from 
-    command line.
+  # SmpCommandLine is a light-weight header-file-only tool used to parse and extract arguments from command line.
 
     You may check the example codes below for quick usage.
 
@@ -145,4 +144,4 @@ SmpCommandLine is a light-weight header-file-only tool used to parse and extract
     return(0);
     }
     // I this case, user types in command line: $./yourprogramname original.jpg output.jpg --index 123 --radius 6.28 --description "this is a demo app"    
-###
+#the end.
