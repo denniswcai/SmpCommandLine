@@ -3,7 +3,7 @@
 // Dennis @ 2021-05
 
 /* 
-### Descriptions: SmpCommandLine (V0.5)
+### Descriptions: SmpCommandLine
 
   # SmpCommandLine is a light-weight header-file-only tool used to parse and extract arguments from 
     command line.
@@ -159,19 +159,23 @@
 #include <string>
 #include <algorithm> // for to_lower
 #include <cctype>
-#include "DebugMessage.h"
+
+#ifndef DEBUG_MESSAGE 
+#define DEBUG_MESSAGE( x, ... )    printf( x, ##__VA_ARGS__ )
+#define ERROR_MESSAGE( x, ... )    { printf( "ERROR!: "); printf( x, ##__VA_ARGS__ ); }
+#endif
 
 class SmpCommandLine 
 {
   private:
-    const std::string _VERSION_NUMBER_ = "SmpCommandLine V0.5, Dennis @ 2021-05"; //2021-05    
+    const std::string _VERSION_NUMBER_ = "SmpCommandLine V0.6, Dennis @ 2021-05";    
   
   protected:
     const char hyphenchar = '-';
     const std::string singleHyphen = std::string("-");
     const std::string doubleHyphen = std::string("--");
     const std::string emptyString  = std::string("");
-    const bool        bQuitOnError = true;
+    const bool        bQuitOnError = false;
 
     std::vector<std::string> arguments;
     std::vector<std::string> helpMessageQueue;
@@ -180,6 +184,53 @@ class SmpCommandLine
     bool bWarningHasShown;
 
   protected:
+
+    std::string bool2String( bool torf )
+    {
+        if( torf )
+            return( std::string("true") );
+        else
+            return( std::string("false") );
+    };
+
+    bool string2Bool( std::string boolName, bool defaultValue = false, int *pErrorCode = NULL )
+    {
+        if( !boolName.empty() ) 
+        {
+            std::string argInLower;
+
+            std::transform( boolName.begin(), boolName.end(), 
+                            argInLower.begin(), [](unsigned char c){ return std::tolower(c); } );
+
+            if( argInLower == std::string("no")   || argInLower == std::string("n") || 
+                argInLower == std::string("false")|| argInLower == std::string("f") ) 
+            {
+                if( pErrorCode != NULL )
+                    pErrorCode = 0;
+                return( false );
+            } 
+            else if( argInLower == std::string("yes")  || argInLower == std::string("y") || 
+                     argInLower == std::string("true") || argInLower == std::string("t") ) 
+            {
+                if( pErrorCode != NULL )
+                   *pErrorCode = 0;
+                return( true );
+            } 
+            else 
+            {    
+                if( pErrorCode != NULL )
+                   *pErrorCode = -1;
+                return( defaultValue );
+            }
+        } 
+        else 
+        { 
+            if( pErrorCode != NULL )
+               *pErrorCode = -1;
+            return( defaultValue );
+        }
+    };
+
     std::string getFlaggedArgument( const char* shortFlag, const char* longFlag, bool bFlagOnly=false )
     {
         if( shortFlag == NULL && longFlag == NULL ) {
@@ -213,10 +264,12 @@ class SmpCommandLine
 
             if( longFlag[0] == hyphenchar && longFlag[1] != hyphenchar ) {
                 // ERROR: User has specified a wrong format of longFlag:
-                ERROR_MESSAGE( "Source code error: In %s(), illegal format of long flag in calling. \
-                    (use double hyphen '--flag' or no hyphen 'flag' for long flags", __FUNCTION__ );
+                ERROR_MESSAGE( "In %s(), illegal format of long flag in calling. \
+                        (use double hyphen '--flag' or no hyphen 'flag' for long flags", __FUNCTION__ );
                 if( bQuitOnError ) {
                     exit(-1);
+                } else {
+                    return( emptyString );
                 }
             }
         }
@@ -239,13 +292,11 @@ class SmpCommandLine
                 {
                     return(std::string(" "));
                 }
-                
                 i--; // important!!
             }
         }
         //DEBUG_MESSAGE( "%s: flag:%s, returns empty string.\n", __FUNCTION__, 
         //               (shortFlag!=NULL? shortFlag : longFlag) );
-
         return( emptyString );
     };
 
@@ -276,7 +327,6 @@ class SmpCommandLine
                 }
             }
         }
-
         return(emptyString);
     };
 
@@ -342,10 +392,10 @@ class SmpCommandLine
 
   public:
 
-    enum {
-        WITH_ARG   = 0,
+    typedef enum {
+        WITH_VALUE  = 0,
         FLAG_ONLY  = 1
-    };
+    } BoolArgType;
 
     SmpCommandLine( int argc, char *const argv[] )
     {
@@ -390,7 +440,7 @@ class SmpCommandLine
         }
     };
 
-    // Extract FLAGGED argument in int type
+    // Extract FLAGGED argument of int type
     int getInteger( const char* shortFlag, const char* longFlag, int defaultValue = 0, const char* helpMsg = "" )
     {
         addHelpMessage( shortFlag, longFlag, std::to_string(defaultValue), helpMsg );
@@ -404,7 +454,7 @@ class SmpCommandLine
             {
                 return( atoi( valueString.c_str() ) );
             } else {
-                ERROR_MESSAGE( "Command line error: Invalid number following flag %s", 
+                ERROR_MESSAGE( "Invalid number following flag %s in command line.\n", 
                                 (shortFlag!=NULL? shortFlag:longFlag) );
                 if( bQuitOnError ) {
                     exit(-1);
@@ -418,7 +468,7 @@ class SmpCommandLine
         }
     };
 
-    // Extract UNFLAGGED argument in int type
+    // Extract UNFLAGGED argument of int type
     int getInteger( int index, int defaultValue = 0, const char* helpMsg = "" )
     {   
         addHelpMessage( index, std::to_string(defaultValue), helpMsg );
@@ -433,7 +483,7 @@ class SmpCommandLine
                 return( atoi( valueString.c_str() ) );
             } else 
             {
-                ERROR_MESSAGE( "Command line error: Invalid number in position %d", index );
+                ERROR_MESSAGE( "Invalid number at position %d in command line.\n", index );
                 if( bQuitOnError ) {
                     exit(-1);
                 } else { 
@@ -446,7 +496,7 @@ class SmpCommandLine
         }
     };
 
-    // Extract FLAGGED argument in flat type
+    // Extract FLAGGED argument of flat type
     float getFloat( const char* shortFlag, const char* longFlag, float defaultValue = 0.0, const char* helpMsg = "" )
     {
         addHelpMessage( shortFlag, longFlag, std::to_string(defaultValue), helpMsg );
@@ -462,7 +512,7 @@ class SmpCommandLine
             } 
             else 
             {
-                ERROR_MESSAGE( "Command line error: Invalid number following flag %s", 
+                ERROR_MESSAGE( "Invalid number following flag %s in command line.\n", 
                                (shortFlag!=NULL? shortFlag:longFlag) );
                 if( bQuitOnError ) {
                     exit(-1);
@@ -477,10 +527,10 @@ class SmpCommandLine
         }
     };
 
-    // Extract UNFLAGGED argument in flat type
+    // Extract UNFLAGGED argument of flat type
     float getFloat( int index, float defaultValue = 0.0, const char* helpMsg = "" )
     {
-        addHelpMessage( index, to_string(defaultValue), helpMsg );
+        addHelpMessage( index, std::to_string(defaultValue), helpMsg );
         
         std::string valueString = getUnflaggedArgument( index );
        
@@ -493,7 +543,7 @@ class SmpCommandLine
             } 
             else 
             {
-                ERROR_MESSAGE( "Command line error: Invalid number in position %d", index );
+                ERROR_MESSAGE( "Invalid number at position %d in command line.\n", index );
                 if( bQuitOnError ) {
                     exit(-1);
                 } else { 
@@ -507,7 +557,7 @@ class SmpCommandLine
         }
     };
 
-    // Extract FLAGGED argument in double type
+    // Extract FLAGGED argument of double type
     double getDouble( const char* shortFlag, const char* longFlag, double defaultValue = 0.0, const char* helpMsg = "" )
     {
         addHelpMessage( shortFlag, longFlag, std::to_string(defaultValue), helpMsg );
@@ -523,7 +573,7 @@ class SmpCommandLine
             } 
             else 
             {
-                ERROR_MESSAGE( "Command line error: Invalid number following flag %s", 
+                ERROR_MESSAGE( "Invalid number following flag %s in command line.\n", 
                                (shortFlag!=NULL? shortFlag:longFlag) );
                 if( bQuitOnError ) {
                     exit(-1);
@@ -537,7 +587,7 @@ class SmpCommandLine
         }
     };
 
-    // Extract UNFLAGGED argument in double type
+    // Extract UNFLAGGED argument of double type
     double getDouble( int index, double defaultValue = 0.0, const char* helpMsg = "" )
     {
         addHelpMessage( index, std::to_string(defaultValue), helpMsg );
@@ -553,7 +603,7 @@ class SmpCommandLine
             } 
             else 
             {
-                ERROR_MESSAGE( "Command line error: Invalid number in position %d", index );
+                ERROR_MESSAGE( "Invalid number at position %d in command line.\n", index );
                 if( bQuitOnError ) {
                     exit(-1);
                 } else { 
@@ -566,12 +616,12 @@ class SmpCommandLine
         }
     };
 
-    // Extract FLAGGED argument in bealean type
-    bool getBoolean( const char* shortFlag, const char* longFlag, bool bFlagOnly = true, bool defaultValue = false, const char* helpMsg = "" )
+    // Extract FLAGGED argument of bealean type
+    bool getBoolean( const char* shortFlag, const char* longFlag, BoolArgType boolArgType = FLAG_ONLY , bool defaultValue = false, const char* helpMsg = "" )
     {
-        if( bFlagOnly && defaultValue )
+        if( boolArgType==FLAG_ONLY && defaultValue )
         {
-            ERROR_MESSAGE( "Source usage error: In %s(), when bFlagOnly is set to true, defaultValue must be set to false.", __FUNCTION__ );
+            ERROR_MESSAGE( "in calling %s(), when boolArgType is set to FLAG_ONLY, defaultValue must be set to false.", __FUNCTION__ );
                
             if( bQuitOnError )
                 exit(-1);
@@ -579,74 +629,82 @@ class SmpCommandLine
                 defaultValue = false;
         }
 
-        addHelpMessage( shortFlag, longFlag, std::to_string(defaultValue), helpMsg, bFlagOnly );
+        addHelpMessage( shortFlag, longFlag, bool2String(defaultValue), helpMsg, (boolArgType==FLAG_ONLY) );
 
-        std::string valueString = getFlaggedArgument( shortFlag, longFlag, bFlagOnly );
+        std::string valueString = getFlaggedArgument( shortFlag, longFlag, (boolArgType==FLAG_ONLY) );
     
         if( !valueString.empty() ) 
         {
-            if( bFlagOnly )
+            if( boolArgType==FLAG_ONLY )
                 return( true );
+            
+            int  errorCode;
+            bool retValue = string2Bool( valueString, defaultValue, &errorCode );
 
-            std::string argInLower;
-            std::transform( valueString.begin(), valueString.end(), 
-                           argInLower.begin(), [](unsigned char c){ return std::tolower(c); } );
-
-            if( argInLower == std::string("no")   || argInLower == std::string("n") || 
-                argInLower == std::string("false")|| argInLower == std::string("f") ) 
-            {
-                return( false );
-            } else if( 
-                argInLower == std::string("yes")  || argInLower == std::string("y") || 
-                argInLower == std::string("true") || argInLower == std::string("t") )
-            {
-                return( true );
+            if( errorCode == 0 ) {
+                return( retValue );
             } else {
-                
-                ERROR_MESSAGE( "Command line error: Invalid value for boolean flag (%s)", (shortFlag!=NULL? shortFlag:longFlag) );
-                
-                if( bQuitOnError ) {
-                    exit(-1);
-                } else {
-                    DEBUG_MESSAGE( "Use default value (%d)", defaultValue );
-                    return( defaultValue );
-                }
-            }
-        } else { 
+                ERROR_MESSAGE( "Invalid argument for boolean type in command line (flag=%s),"
+                               " return default value.\n", (shortFlag!=NULL? shortFlag : longFlag) );
+                return( defaultValue );
+            } 
+        }
+        else 
+        {
             return( defaultValue );
         }
     };
 
-    // Extract FLAGGED argument in string type
-    std::string getString( const char* shortFlag, const char* longFlag, const char* defaultValue = NULL, const char* helpMsg = "" )
-    {
-        addHelpMessage( shortFlag, longFlag, (defaultValue!=NULL? std::string(defaultValue) : std::string("")), helpMsg );
-        
-        std::string valueString = getFlaggedArgument( shortFlag, longFlag );
-    
-        if( !valueString.empty() && valueString != std::string(" ") ) {
-            return( valueString );
-        } else {
-            if( defaultValue != NULL )
-                return( std::string(defaultValue) );
-            else 
-                return( std::string("") );
+
+    // Extract UNFLAGGED argument of boolean type
+    bool getBoolean( int index, bool defaultValue=false, const char* helpMsg = "" )
+    {   
+        addHelpMessage( index, bool2String(defaultValue), helpMsg );
+
+        std::string argString = getUnflaggedArgument( index );
+       
+        if( !argString.empty() ) 
+        {
+            int errorCode;
+            bool retValue = string2Bool( argString, defaultValue, &errorCode );
+
+            if( errorCode == 0 ) {
+                return( retValue );
+            } else {
+                ERROR_MESSAGE( "Invalid argument for boolean type in command line (index=%d), return default value.\n", index );
+                return( defaultValue );
+            } 
+        }
+        else 
+        {
+            return( defaultValue );
         }
     };
 
-    // Extract UNFLAGGED argument in string type
-    std::string getString( int index, const char* defaultValue = NULL, const char* helpMsg = "" )
+    // Extract FLAGGED argument of string type
+    std::string getString( const char* shortFlag, const char* longFlag, std::string defaultValue = "", const char* helpMsg = "" )
+    {
+        addHelpMessage( shortFlag, longFlag, defaultValue, helpMsg );
+        
+        std::string valueString = getFlaggedArgument( shortFlag, longFlag );
+    
+        if( !valueString.empty() && valueString != std::string(" ") ) 
+            return( valueString );
+        else 
+            return( defaultValue );
+    };
+
+    // Extract UNFLAGGED argument of string type
+    std::string getString( int index, std::string defaultValue = "", const char* helpMsg = "" )
     {   
-        addHelpMessage( index, (defaultValue!=NULL? std::string(defaultValue) : std::string("")), helpMsg );
+        addHelpMessage( index, defaultValue, helpMsg );
         
         std::string argString = getUnflaggedArgument( index );
        
         if( !argString.empty() ) 
             return( argString );
-        else if( defaultValue != NULL )
-            return( std::string(defaultValue) );
         else 
-            return( std::string("") );
+            return( defaultValue );
     };
 
     //// Alternative Encapsulation:
@@ -660,16 +718,6 @@ class SmpCommandLine
         return( getInteger( index, defaultValue, helpMsg ) );
     };
 
-    float getArgument( const char* shortFlag, const char* longFlag, float defaultValue, const char* helpMsg = "" )
-    {
-        return( getFloat( shortFlag, longFlag, defaultValue, helpMsg ) );
-    };
-
-    float getArgument( int index, float defaultValue, const char* helpMsg = "" )
-    {
-        return( getFloat( index, defaultValue, helpMsg ) );
-    };
-
     double getArgument( const char* shortFlag, const char* longFlag, double defaultValue, const char* helpMsg = "" )
     {
         return( getDouble( shortFlag, longFlag, defaultValue, helpMsg ) );
@@ -680,17 +728,17 @@ class SmpCommandLine
         return( getDouble( index, defaultValue, helpMsg ) );
     };
 
-    bool getArgument( const char* shortFlag, const char* longFlag, bool bFlagOnly, bool defaultValue = false, const char* helpMsg = "" )
+    bool getArgument( const char* shortFlag, const char* longFlag, BoolArgType boolArgType=FLAG_ONLY, bool defaultValue = false, const char* helpMsg = "" )
     {
-        return( getBoolean( shortFlag, longFlag, bFlagOnly, defaultValue, helpMsg ) );
+        return( getBoolean( shortFlag, longFlag, boolArgType, defaultValue, helpMsg ) );
     };
 
-    std::string getArgument( const char* shortFlag, const char* longFlag, const char* defaultValue = NULL, const char* helpMsg = "" )
+    std::string getArgument( const char* shortFlag, const char* longFlag, std::string defaultValue = "", const char* helpMsg = "" )
     {
         return( getString( shortFlag, longFlag, defaultValue, helpMsg ) );
     };
 
-    std::string getArgument( int index, const char* defaultValue = NULL, const char* helpMsg = "" )
+    std::string getArgument( int index, std::string defaultValue = "", const char* helpMsg = "" )
     {   
         return( getString( index, defaultValue, helpMsg ) );
     };
@@ -738,7 +786,6 @@ class SmpCommandLine
                 }
             }
         } 
-       
         DEBUG_MESSAGE("checkValidity(): WARNING! Feature not completedly implemented.\n");
         return(0);
     };
