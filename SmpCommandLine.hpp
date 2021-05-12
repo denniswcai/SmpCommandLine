@@ -83,8 +83,8 @@
        Again, please remember to extract these unflagged arguments after extracting all wanted flagged
        arguments.
        
-    10) Finally, if necessary, call SmpCommandLine::showHelpMessage() to display help hint to user. the help 
-       message is automatically composed from the helpMsg strings provided in the above calls to 
+    10) Finally, if necessary, call SmpCommandLine::showHelpMsgOnRequest() to display help hint when 
+       user type -h or --help in the command line. The help message is automatically composed from the helpMsg strings provided in the above calls to 
        getArgument(..., helpMsg ).
 
   # IMPORTANT NOTES: 
@@ -144,7 +144,7 @@
     
     return(0);
     }
-    // I this case, user types in command line: $./yourprogramname original.jpg output.jpg --index 123 --radius 6.28 --description "this is a demo app"    
+    // In this case, user types in command line: $./yourprogramname original.jpg output.jpg --index 123 --radius 6.28 --description "this is a demo app"    
 ###
 */
 
@@ -167,7 +167,7 @@
 class SmpCommandLine 
 {
   private:
-    const std::string _VERSION_NUMBER_ = "SmpCommandLine V0.6, Dennis @ 2021-05";    
+    const std::string _VERSION_NUMBER_ = "SmpCommandLine V0.7, Dennis @ 2021-05";    
   
   protected:
     const char hyphenchar = '-';
