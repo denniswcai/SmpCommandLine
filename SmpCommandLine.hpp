@@ -148,7 +148,6 @@
 ###
 */
 
-
 #ifndef __SMP_COMMAND_LINE_HPP__
 #define __SMP_COMMAND_LINE_HPP__
 
@@ -181,7 +180,8 @@ class SmpCommandLine
     std::vector<std::string> helpMessageQueue;
     std::string firstLineFlagMsg;
     int  maxUnflaggedArgs;
-    bool bWarningHasShown;
+    bool mbWarningHasShown;
+    bool mbHelpMsgHasShown;
 
   protected:
 
@@ -307,15 +307,15 @@ class SmpCommandLine
 
         for( int i = 0, pi = 0; i < arguments.size(); i++ )
         {
-            if( arguments[i][0] == '-' ) 
+            if( arguments[i][0] == '-' && arguments[i] != std::string("-h") && arguments[i] != std::string("--help") ) 
             {
-                if( !bWarningHasShown ) {
+                if( !mbWarningHasShown ) {
                     DEBUG_MESSAGE ("WARNING! There may be unknown flags in the command line, or in source code you have extracted\n" ); 
                     DEBUG_MESSAGE ("         unflagged arguments before extracting all the flagged ones (i.e. argument with leading\n" );
                     DEBUG_MESSAGE ("         '-' or '--' sign). Please make sure to extract common arguments after extracting \n" );
                     DEBUG_MESSAGE ("         all flagged arguments in source code.\n");
                     DEBUG_MESSAGE ("         Consult the readme description in SmpCommandLine.hpp for details.\n");
-                    bWarningHasShown = true;
+                    mbWarningHasShown = true;
                 }
             } 
             else 
@@ -423,10 +423,11 @@ class SmpCommandLine
             }
         }
 
-        helpMessageQueue.push_back( "Usage:");
+        helpMessageQueue.push_back( "Help Message: Usage of " + arguments[0]);
         helpMessageQueue.push_back( arguments[0] + " [argument1] ... [--flag1 arg] ..." );
 
-        bWarningHasShown = false;
+        mbWarningHasShown = false;
+        mbHelpMsgHasShown = false;
         maxUnflaggedArgs = 0;
 
         // Bonus extension: show version info of SmpCommandLine(this module, not client software)
@@ -770,7 +771,18 @@ class SmpCommandLine
             }
             std::cout << helpMessageQueue[i] << std::endl;
         }
+
+        mbHelpMsgHasShown = true;
     };
+
+    void showHelpMsgOnRequest()
+    {
+        // Handling help message trigers:
+        bool bHelpMsgRequested = getBoolean( "h", "help", FLAG_ONLY, false, "Show help message" );
+
+        if( bHelpMsgRequested && ! mbHelpMsgHasShown )
+            showHelpMessage();
+    }
 
     //  Check the validity of user inputed command line, according to the getArgument functions called
     //  previously in code.

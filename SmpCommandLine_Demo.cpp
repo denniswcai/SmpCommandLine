@@ -20,17 +20,16 @@ int main( int argc, char *argv[] )
     std::string srcFileName = userCommands.getArgument( 1, "", "file name of the source image" );
     std::string tgtFileName = userCommands.getArgument( 2, "", "file name of the target image" );
 
+    // Check whether need to show help message:
+    userCommands.showHelpMsgOnRequest();
+
+    //
     std::cout << "index = "  << index << std::endl;
     std::cout << "radius = " << radius << std::endl;
     std::cout << "bShowImage = " << bShowImage << std::endl;
     std::cout << "description : " << description <<std::endl;
     std::cout << "srcFileName : " << srcFileName << std::endl;
     std::cout << "tgtFileName : " << tgtFileName << std::endl;
-
-    // Show help message:
-    if( argc < 3 ) {
-        userCommands.showHelpMessage();
-    }
 
 return(0);
 }
