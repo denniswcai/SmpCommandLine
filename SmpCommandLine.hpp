@@ -778,13 +778,13 @@ class SmpCommandLine
     bool helpMessageWanted()
     {
         // Handling help message trigers:
-        return( getBoolean( "h", "help", CMD_FLAG_ONLY, false, "Show help message" ) );
+        return( getBoolean( "h", "help", CMD_FLAG_ONLY, false, "Show this help message" ) );
     }
 
     void showHelpMsgOnRequest()
     {
         // Handling help message trigers:
-        bool bHelpMsgRequested = getBoolean( "h", "help", CMD_FLAG_ONLY, false, "Show help message" );
+        bool bHelpMsgRequested = getBoolean( "h", "help", CMD_FLAG_ONLY, false, "Show this help message" );
 
         if( bHelpMsgRequested && ! mbHelpMsgHasShown )
             showHelpMessage();
