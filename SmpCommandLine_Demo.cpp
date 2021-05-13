@@ -13,7 +13,7 @@ int main( int argc, char *argv[] )
     // Firstly extract all flagged argumants (i.e. argument identified by a leading hyphen flag)
     int  index = userCommands.getInteger( "i", "index", int(0), "specifies the index of the item" );
     double radius = userCommands.getDouble( "r", "radius", double(6750.0), "the radius of the shpere" ); 
-    bool bShowImage = userCommands.getBoolean( "s", "show_image", SmpCommandLine::FLAG_ONLY, false, "whether display the image during processing" );
+    bool bShowImage = userCommands.getBoolean( "s", "show_image", CMD_FLAG_ONLY, false, "whether display the image during processing" );
     std::string description = userCommands.getString( "d", "description", "", "a description text string" );
  
     // Then, extract unflagged arguments:
@@ -21,7 +21,9 @@ int main( int argc, char *argv[] )
     std::string tgtFileName = userCommands.getArgument( 2, "", "file name of the target image" );
 
     // Check whether need to show help message:
-    userCommands.showHelpMsgOnRequest();
+    if( userCommands.helpMessageWanted() || argc < 3 ) {
+        userCommands.showHelpMessage();
+    }
 
     //
     std::cout << "index = "  << index << std::endl;

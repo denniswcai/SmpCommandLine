@@ -160,14 +160,22 @@
 #include <cctype>
 
 #ifndef DEBUG_MESSAGE 
-#define DEBUG_MESSAGE( x, ... )    printf( x, ##__VA_ARGS__ )
-#define ERROR_MESSAGE( x, ... )    { printf( "ERROR!: "); printf( x, ##__VA_ARGS__ ); }
+#define _DEBUG_MESSAGE( x, ... )    printf( x, ##__VA_ARGS__ )
+#define _ERROR_MESSAGE( x, ... )    { printf( "ERROR!: "); printf( x, ##__VA_ARGS__ ); }
+#else   
+#define _DEBUG_MESSAGE DEBUG_MESSAGE
+#define _ERROR_MESSAGE ERROR_MESSAGE
 #endif
+
+typedef enum{
+    CMD_WITH_VALUE = 0,
+    CMD_FLAG_ONLY = 1,
+} SmpCommandType;
 
 class SmpCommandLine 
 {
   private:
-    const std::string _VERSION_NUMBER_ = "SmpCommandLine V0.7, Dennis @ 2021-05";    
+    const std::string _VERSION_NUMBER_ = "SmpCommandLine V0.8, Dennis @ 2021-05";    
   
   protected:
     const char hyphenchar = '-';
@@ -234,7 +242,7 @@ class SmpCommandLine
     std::string getFlaggedArgument( const char* shortFlag, const char* longFlag, bool bFlagOnly=false )
     {
         if( shortFlag == NULL && longFlag == NULL ) {
-            ERROR_MESSAGE( "Source usage error: shortFlag and longFlag can not both be NULL!");
+            _ERROR_MESSAGE( "Source usage error: shortFlag and longFlag can not both be NULL!");
             
             if( bQuitOnError ) 
                 exit(-1);
@@ -264,7 +272,7 @@ class SmpCommandLine
 
             if( longFlag[0] == hyphenchar && longFlag[1] != hyphenchar ) {
                 // ERROR: User has specified a wrong format of longFlag:
-                ERROR_MESSAGE( "In %s(), illegal format of long flag in calling. \
+                _ERROR_MESSAGE( "In %s(), illegal format of long flag in calling. \
                         (use double hyphen '--flag' or no hyphen 'flag' for long flags", __FUNCTION__ );
                 if( bQuitOnError ) {
                     exit(-1);
@@ -282,20 +290,17 @@ class SmpCommandLine
             {
                 arguments.erase( arguments.begin()+i );
 
-                if( !bFlagOnly && i < arguments.size() && !arguments[i].empty() ) 
-                {
+                if( !bFlagOnly && i < arguments.size() && !arguments[i].empty() ) {
                     std::string valueString = arguments[i];
                     arguments.erase( arguments.begin()+i );
                     return( valueString );
-                } 
-                else 
-                {
+                } else {
                     return(std::string(" "));
                 }
                 i--; // important!!
             }
         }
-        //DEBUG_MESSAGE( "%s: flag:%s, returns empty string.\n", __FUNCTION__, 
+        //_DEBUG_MESSAGE( "%s: flag:%s, returns empty string.\n", __FUNCTION__, 
         //               (shortFlag!=NULL? shortFlag : longFlag) );
         return( emptyString );
     };
@@ -307,14 +312,14 @@ class SmpCommandLine
 
         for( int i = 0, pi = 0; i < arguments.size(); i++ )
         {
-            if( arguments[i][0] == '-' && arguments[i] != std::string("-h") && arguments[i] != std::string("--help") ) 
+            if( arguments[i][0] == '-' )
             {
-                if( !mbWarningHasShown ) {
-                    DEBUG_MESSAGE ("WARNING! There may be unknown flags in the command line, or in source code you have extracted\n" ); 
-                    DEBUG_MESSAGE ("         unflagged arguments before extracting all the flagged ones (i.e. argument with leading\n" );
-                    DEBUG_MESSAGE ("         '-' or '--' sign). Please make sure to extract common arguments after extracting \n" );
-                    DEBUG_MESSAGE ("         all flagged arguments in source code.\n");
-                    DEBUG_MESSAGE ("         Consult the readme description in SmpCommandLine.hpp for details.\n");
+                if( !mbWarningHasShown && arguments[i] != std::string("-h") && arguments[i] != std::string("--help") ) {
+                    _ERROR_MESSAGE ("WARNING! There may be unknown flags in the command line, or in source code you have extracted\n" ); 
+                    _ERROR_MESSAGE ("         unflagged arguments before extracting all the flagged ones (i.e. argument with leading\n" );
+                    _ERROR_MESSAGE ("         '-' or '--' sign). Please make sure to extract common arguments after extracting \n" );
+                    _ERROR_MESSAGE ("         all flagged arguments in source code.\n");
+                    _ERROR_MESSAGE ("         Consult the readme description in SmpCommandLine.hpp for details.\n");
                     mbWarningHasShown = true;
                 }
             } 
@@ -392,11 +397,6 @@ class SmpCommandLine
 
   public:
 
-    typedef enum {
-        WITH_VALUE  = 0,
-        FLAG_ONLY  = 1
-    } BoolArgType;
-
     SmpCommandLine( int argc, char *const argv[] )
     {
         for( int i = 0; i < argc; i++ )
@@ -455,12 +455,12 @@ class SmpCommandLine
             {
                 return( atoi( valueString.c_str() ) );
             } else {
-                ERROR_MESSAGE( "Invalid number following flag %s in command line.\n", 
+                _ERROR_MESSAGE( "Invalid number following flag %s in command line.\n", 
                                 (shortFlag!=NULL? shortFlag:longFlag) );
                 if( bQuitOnError ) {
                     exit(-1);
                 } else { 
-                    DEBUG_MESSAGE( "Use default value" );
+                    _DEBUG_MESSAGE( "Use default value" );
                     return( defaultValue );
                 }    
             }
@@ -484,11 +484,11 @@ class SmpCommandLine
                 return( atoi( valueString.c_str() ) );
             } else 
             {
-                ERROR_MESSAGE( "Invalid number at position %d in command line.\n", index );
+                _ERROR_MESSAGE( "Invalid number at position %d in command line.\n", index );
                 if( bQuitOnError ) {
                     exit(-1);
                 } else { 
-                    DEBUG_MESSAGE( "Use default value" );
+                    _DEBUG_MESSAGE( "Use default value" );
                     return( defaultValue );
                 }    
             }
@@ -513,12 +513,12 @@ class SmpCommandLine
             } 
             else 
             {
-                ERROR_MESSAGE( "Invalid number following flag %s in command line.\n", 
+                _ERROR_MESSAGE( "Invalid number following flag %s in command line.\n", 
                                (shortFlag!=NULL? shortFlag:longFlag) );
                 if( bQuitOnError ) {
                     exit(-1);
                 } else { 
-                    DEBUG_MESSAGE( "Use default value" );
+                    _DEBUG_MESSAGE( "Use default value" );
                     return( defaultValue );
                 }    
             }
@@ -544,11 +544,11 @@ class SmpCommandLine
             } 
             else 
             {
-                ERROR_MESSAGE( "Invalid number at position %d in command line.\n", index );
+                _ERROR_MESSAGE( "Invalid number at position %d in command line.\n", index );
                 if( bQuitOnError ) {
                     exit(-1);
                 } else { 
-                    DEBUG_MESSAGE( "Use default value" );
+                    _DEBUG_MESSAGE( "Use default value" );
                     return( defaultValue );
                 }    
             }
@@ -574,12 +574,12 @@ class SmpCommandLine
             } 
             else 
             {
-                ERROR_MESSAGE( "Invalid number following flag %s in command line.\n", 
+                _ERROR_MESSAGE( "Invalid number following flag %s in command line.\n", 
                                (shortFlag!=NULL? shortFlag:longFlag) );
                 if( bQuitOnError ) {
                     exit(-1);
                 } else { 
-                    DEBUG_MESSAGE("Use default value");
+                    _DEBUG_MESSAGE("Use default value");
                     return( defaultValue );
                 }    
             }
@@ -604,11 +604,11 @@ class SmpCommandLine
             } 
             else 
             {
-                ERROR_MESSAGE( "Invalid number at position %d in command line.\n", index );
+                _ERROR_MESSAGE( "Invalid number at position %d in command line.\n", index );
                 if( bQuitOnError ) {
                     exit(-1);
                 } else { 
-                    DEBUG_MESSAGE("Use default value");
+                    _DEBUG_MESSAGE("Use default value");
                     return( defaultValue );
                 }    
             }
@@ -618,11 +618,11 @@ class SmpCommandLine
     };
 
     // Extract FLAGGED argument of bealean type
-    bool getBoolean( const char* shortFlag, const char* longFlag, BoolArgType boolArgType = FLAG_ONLY , bool defaultValue = false, const char* helpMsg = "" )
+    bool getBoolean( const char* shortFlag, const char* longFlag, SmpCommandType cmdType = CMD_FLAG_ONLY , bool defaultValue = false, const char* helpMsg = "" )
     {
-        if( boolArgType==FLAG_ONLY && defaultValue )
+        if( cmdType==CMD_FLAG_ONLY && defaultValue )
         {
-            ERROR_MESSAGE( "in calling %s(), when boolArgType is set to FLAG_ONLY, defaultValue must be set to false.", __FUNCTION__ );
+            _ERROR_MESSAGE( "in calling %s(), when cmdType is set to CMD_FLAG_ONLY, defaultValue must be set to false.", __FUNCTION__ );
                
             if( bQuitOnError )
                 exit(-1);
@@ -630,13 +630,13 @@ class SmpCommandLine
                 defaultValue = false;
         }
 
-        addHelpMessage( shortFlag, longFlag, bool2String(defaultValue), helpMsg, (boolArgType==FLAG_ONLY) );
+        addHelpMessage( shortFlag, longFlag, bool2String(defaultValue), helpMsg, (cmdType==CMD_FLAG_ONLY) );
 
-        std::string valueString = getFlaggedArgument( shortFlag, longFlag, (boolArgType==FLAG_ONLY) );
+        std::string valueString = getFlaggedArgument( shortFlag, longFlag, (cmdType==CMD_FLAG_ONLY) );
     
         if( !valueString.empty() ) 
         {
-            if( boolArgType==FLAG_ONLY )
+            if( cmdType==CMD_FLAG_ONLY )
                 return( true );
             
             int  errorCode;
@@ -645,7 +645,7 @@ class SmpCommandLine
             if( errorCode == 0 ) {
                 return( retValue );
             } else {
-                ERROR_MESSAGE( "Invalid argument for boolean type in command line (flag=%s),"
+                _ERROR_MESSAGE( "Invalid argument for boolean type in command line (flag=%s),"
                                " return default value.\n", (shortFlag!=NULL? shortFlag : longFlag) );
                 return( defaultValue );
             } 
@@ -672,7 +672,7 @@ class SmpCommandLine
             if( errorCode == 0 ) {
                 return( retValue );
             } else {
-                ERROR_MESSAGE( "Invalid argument for boolean type in command line (index=%d), return default value.\n", index );
+                _ERROR_MESSAGE( "Invalid argument for boolean type in command line (index=%d), return default value.\n", index );
                 return( defaultValue );
             } 
         }
@@ -729,9 +729,9 @@ class SmpCommandLine
         return( getDouble( index, defaultValue, helpMsg ) );
     };
 
-    bool getArgument( const char* shortFlag, const char* longFlag, BoolArgType boolArgType=FLAG_ONLY, bool defaultValue = false, const char* helpMsg = "" )
+    bool getArgument( const char* shortFlag, const char* longFlag, SmpCommandType cmdType = CMD_FLAG_ONLY, bool defaultValue = false, const char* helpMsg = "" )
     {
-        return( getBoolean( shortFlag, longFlag, boolArgType, defaultValue, helpMsg ) );
+        return( getBoolean( shortFlag, longFlag, cmdType, defaultValue, helpMsg ) );
     };
 
     std::string getArgument( const char* shortFlag, const char* longFlag, std::string defaultValue = "", const char* helpMsg = "" )
@@ -775,10 +775,16 @@ class SmpCommandLine
         mbHelpMsgHasShown = true;
     };
 
+    bool helpMessageWanted()
+    {
+        // Handling help message trigers:
+        return( getBoolean( "h", "help", CMD_FLAG_ONLY, false, "Show help message" ) );
+    }
+
     void showHelpMsgOnRequest()
     {
         // Handling help message trigers:
-        bool bHelpMsgRequested = getBoolean( "h", "help", FLAG_ONLY, false, "Show help message" );
+        bool bHelpMsgRequested = getBoolean( "h", "help", CMD_FLAG_ONLY, false, "Show help message" );
 
         if( bHelpMsgRequested && ! mbHelpMsgHasShown )
             showHelpMessage();
@@ -793,12 +799,12 @@ class SmpCommandLine
             for( int i = 1; i < arguments.size(); i++ )
             {
                 if( arguments[i][0] == hyphenchar ) {
-                    ERROR_MESSAGE( "checkValidity(): Unknown flag %s detected in command line", arguments[i].c_str() );
+                    _ERROR_MESSAGE( "checkValidity(): Unknown flag %s detected in command line", arguments[i].c_str() );
                     return(-1);
                 }
             }
         } 
-        DEBUG_MESSAGE("checkValidity(): WARNING! Feature not completedly implemented.\n");
+        _DEBUG_MESSAGE("checkValidity(): WARNING! Feature not completedly implemented.\n");
         return(0);
     };
 
