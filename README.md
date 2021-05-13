@@ -84,9 +84,10 @@ SmpCommandLine is a light-weight header-file-only tool used to parse and extract
        Again, please remember to extract these unflagged arguments after extracting all wanted flagged
        arguments.
        
-    10) Finally, if necessary, call SmpCommandLine::showHelpMessage() to display help hint to user. the help 
-       message is automatically composed from the helpMsg strings provided in the above calls to 
-       getArgument(..., helpMsg ).
+    10) Finally, if necessary, call SmpCommandLine::showHelpMsgOnRequest() to display help messages when 
+       user requests to do so by adding "-h" or "--help" in the command line. Help message is 
+       automatically composed from the helpMsg strings provided in the above calls of 
+          getXxxxx(..., helpMsg ).
 
   # IMPORTANT NOTES: 
        Please make sure you call ::getArgument( shortFlag, longFlag, ... ) to extract all flagged 
@@ -130,20 +131,19 @@ SmpCommandLine is a light-weight header-file-only tool used to parse and extract
         std::string srcFileName = userCommands.getArgument( 1, NULL, "file name of the source image" );  // call this after get flagged argument
         std::string tgtFileName = userCommands.getArgument( 2, NULL, "file name of the target image" );  // call this after get flagged argument
 
+        // Check, and show help message when requested. 
+        userCommands.showHelpMsgOnRequest();
+        
         std::cout << "index = "  << index << std::endl;
         std::cout << "radius = " << radius << std::endl;
         std::cout << "description : " << description <<std::endl;
         std::cout << "srcFileName : " << srcFileName << std::endl;
         std::cout << "tgtFileName : " << tgtFileName << std::endl;
 
-        if( argc < 3 ) {
-            userCommands.showHelpMessage();
-        }
-
         //....
         //....
     
     return(0);
     }
-    // I this case, user types in command line: $./yourprogramname original.jpg output.jpg --index 123 --radius 6.28 --description "this is a demo app"    
+    // In this case, user types in command line: $./yourprogramname original.jpg output.jpg --index 123 --radius 6.28 --description "this is a demo app"    
 #the end.
