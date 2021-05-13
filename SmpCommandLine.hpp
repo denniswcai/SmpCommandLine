@@ -48,12 +48,12 @@
            getString( shortFlag, longFlag...), to extract a string with specified flag. 
            getBoolean( shortFlag, longFlag...), to extract a boolean with specified flag. 
 
-    6) Take notes to the 'getBoolean()' method. There are two types of command line formats to 
-       specify boolean value, one is simply using a flag (e.g. -b), the present of the flag in command
-       line sets the associated boolean value to true; the other format is using a flag followed by a 
-       text boolean value, explicitly set the boolean to yes/no (or true/false), (e.g.: -b yes /
-       -b false). by default, we use the formal format, unless it is clearly specified by 'bFlagOnly' 
-       parameter when calling getBoolean().
+    6) Take notes to the 'getBoolean()' method. There are two types of command line formats for 
+       boolean value, one is simply using a flag (e.g. -b), the present of that flag in command
+       line sets the associated boolean value to true; the other format is to use a flag followed by  
+       a text boolean name, explicitly setting the boolean to yes/no (or true/false), (e.g.: -b yes, 
+       -b false). by default, we use the formal format, unless it is clearly specified by giving a  
+       'CMD_WITH_VALUE' parameter (of type SmpCommandType) when calling getBoolean().
 
     7) Multipy boolean flags can be combined in one shortFlag starting with a single hythen in 
        command line (e.g.: '-xzvf', which is equalvalue to '-x -z -v -f'). Note in this case the 
