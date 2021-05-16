@@ -90,7 +90,7 @@
       number.
     * string argument cannot contain any printable characters.
 
-  # Examples Codes are in SmpCommandLine_Demo.cpp
+  # Examples Codes could be found in SmpCommandLine_Demo.cpp
 ###
 */
 
