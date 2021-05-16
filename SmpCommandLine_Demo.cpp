@@ -2,7 +2,7 @@
 // Dennis @ 2021-05
 // Codes demostrate how to use SmpCommandLine.hpp
 // Compile: $/g++ SmpCommandLine_Demo.cpp -o my_program
-// Run: $./a.out ...
+// Run: $./my_program ...
 
 #include "./SmpCommandLine.hpp"  
 
