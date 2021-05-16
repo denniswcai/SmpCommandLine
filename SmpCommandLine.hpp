@@ -175,226 +175,8 @@ typedef enum{
 class SmpCommandLine 
 {
   private:
-    const std::string _VERSION_NUMBER_ = "SmpCommandLine V0.8, Dennis @ 2021-05";    
-  
-  protected:
-    const char hyphenchar = '-';
-    const std::string singleHyphen = std::string("-");
-    const std::string doubleHyphen = std::string("--");
-    const std::string emptyString  = std::string("");
-    const bool        bQuitOnError = false;
-
-    std::vector<std::string> arguments;
-    std::vector<std::string> helpMessageQueue;
-    std::string firstLineFlagMsg;
-    int  maxUnflaggedArgs;
-    bool mbWarningHasShown;
-    bool mbHelpMsgHasShown;
-
-  protected:
-
-    std::string bool2String( bool torf )
-    {
-        if( torf )
-            return( std::string("true") );
-        else
-            return( std::string("false") );
-    };
-
-    bool string2Bool( std::string boolName, bool defaultValue = false, int *pErrorCode = NULL )
-    {
-        if( !boolName.empty() ) 
-        {
-            std::string argInLower;
-
-            std::transform( boolName.begin(), boolName.end(), 
-                            argInLower.begin(), [](unsigned char c){ return std::tolower(c); } );
-
-            if( argInLower == std::string("no")   || argInLower == std::string("n") || 
-                argInLower == std::string("false")|| argInLower == std::string("f") ) 
-            {
-                if( pErrorCode != NULL )
-                    pErrorCode = 0;
-                return( false );
-            } 
-            else if( argInLower == std::string("yes")  || argInLower == std::string("y") || 
-                     argInLower == std::string("true") || argInLower == std::string("t") ) 
-            {
-                if( pErrorCode != NULL )
-                   *pErrorCode = 0;
-                return( true );
-            } 
-            else 
-            {    
-                if( pErrorCode != NULL )
-                   *pErrorCode = -1;
-                return( defaultValue );
-            }
-        } 
-        else 
-        { 
-            if( pErrorCode != NULL )
-               *pErrorCode = -1;
-            return( defaultValue );
-        }
-    };
-
-    std::string getFlaggedArgument( const char* shortFlag, const char* longFlag, bool bFlagOnly=false )
-    {
-        if( shortFlag == NULL && longFlag == NULL ) {
-            _ERROR_MESSAGE( "Source usage error: shortFlag and longFlag can not both be NULL!");
-            
-            if( bQuitOnError ) 
-                exit(-1);
-            else
-                return( emptyString );
-        }
-
-        std::string shortFlagStr;
-        std::string longFlagStr;
-
-        if( shortFlag != NULL )
-        {
-            if( shortFlag[0] != hyphenchar ) {
-                shortFlagStr = singleHyphen + shortFlag;
-            } else {
-                shortFlagStr = std::string(shortFlag);
-            }
-        }
-
-        if( longFlag != NULL )
-        {
-            if( longFlag[0] != hyphenchar ) {
-                longFlagStr = doubleHyphen + longFlag;
-            } else {
-                longFlagStr = std::string(longFlag);
-            }
-
-            if( longFlag[0] == hyphenchar && longFlag[1] != hyphenchar ) {
-                // ERROR: User has specified a wrong format of longFlag:
-                _ERROR_MESSAGE( "In %s(), illegal format of long flag in calling. \
-                        (use double hyphen '--flag' or no hyphen 'flag' for long flags", __FUNCTION__ );
-                if( bQuitOnError ) {
-                    exit(-1);
-                } else {
-                    return( emptyString );
-                }
-            }
-        }
-
-        for( int i = 0; i < arguments.size(); i++ )
-        {
-            //std::cout << "i="<<i<<" "<<arguments[i] << " vs " << singleHyphen + shortFlag << std::endl;
-            if( ( shortFlag != NULL && arguments[i] == shortFlagStr ) || 
-                 ( longFlag != NULL && arguments[i] == longFlagStr ) )
-            {
-                arguments.erase( arguments.begin()+i );
-
-                if( !bFlagOnly && i < arguments.size() && !arguments[i].empty() ) {
-                    std::string valueString = arguments[i];
-                    arguments.erase( arguments.begin()+i );
-                    return( valueString );
-                } else {
-                    return(std::string(" "));
-                }
-                i--; // important!!
-            }
-        }
-        //_DEBUG_MESSAGE( "%s: flag:%s, returns empty string.\n", __FUNCTION__, 
-        //               (shortFlag!=NULL? shortFlag : longFlag) );
-        return( emptyString );
-    };
-
-    std::string getUnflaggedArgument( int index )
-    {   
-        if( index > maxUnflaggedArgs )
-            maxUnflaggedArgs = index;
-
-        for( int i = 0, pi = 0; i < arguments.size(); i++ )
-        {
-            if( arguments[i][0] == '-' )
-            {
-                if( !mbWarningHasShown && arguments[i] != std::string("-h") && arguments[i] != std::string("--help") ) {
-                    _ERROR_MESSAGE ("WARNING! There may be unknown flags in the command line, or in source code you have extracted\n" ); 
-                    _ERROR_MESSAGE ("         unflagged arguments before extracting all the flagged ones (i.e. argument with leading\n" );
-                    _ERROR_MESSAGE ("         '-' or '--' sign). Please make sure to extract common arguments after extracting \n" );
-                    _ERROR_MESSAGE ("         all flagged arguments in source code.\n");
-                    _ERROR_MESSAGE ("         Consult the readme description in SmpCommandLine.hpp for details.\n");
-                    mbWarningHasShown = true;
-                }
-            } 
-            else 
-            {
-                if( pi == index ) {
-                    return( arguments[i] );
-                } else { 
-                    pi++;
-                }
-            }
-        }
-        return(emptyString);
-    };
-
-    void addHelpMessage( const char* shortFlag, const char* longFlag, const std::string defaultStr, 
-                         const char* helpMsg, bool bFlagOnly = false )
-    {
-        // Constuct help message for this item:
-        std::string helpStr;
-
-        if( shortFlag != NULL ) {
-            std::string shortFlagStr(shortFlag); 
-
-            if( shortFlagStr[0] != hyphenchar ) {
-                shortFlagStr = singleHyphen + shortFlag;
-            }
-            helpStr = helpStr + shortFlagStr;
-        }
-
-        if( shortFlag != NULL && longFlag != NULL ) {
-            helpStr = helpStr + "/";
-        }
-
-        if( longFlag != NULL ) {
-            std::string longFlagStr(longFlag);
-
-            if( longFlagStr[0] != hyphenchar ) {
-                longFlagStr = doubleHyphen + longFlag;
-            }
-            helpStr = helpStr + longFlagStr;
-        }
-
-        if( !bFlagOnly )
-            helpStr = helpStr + " val";
-
-        // Add info to the first line of help message:
-        firstLineFlagMsg += "["+helpStr+"] ";
-        
-        helpStr = helpStr + " : ";
-        helpStr = helpStr + helpMsg;
-        
-        if( !defaultStr.empty() )
-            helpStr = helpStr + " (defualt value:" + defaultStr + ")";
-        
-        helpMessageQueue.push_back(helpStr);
-    };
-
-    void addHelpMessage( int index, const std::string defaultStr, const char* helpMsg )
-    {
-        std::string helpStr;
-
-        helpStr = helpStr + "argument" + std::to_string(index) + ": ";
-        helpStr = helpStr + helpMsg;
-
-        if( !defaultStr.empty() )
-            helpStr = helpStr + " (defualt value: " + defaultStr + ")";
-        
-        helpMessageQueue.push_back(helpStr);
-    };
-
-    // Forbid calling of default constructor (force user to pass argc and argv into constructor method
-    // (defined below):
-    SmpCommandLine(){};
-
+    const std::string _VERSION_NUMBER_ = "SmpCommandLine V0.9, Dennis @ 2021-05";    
+ 
   public:
 
     SmpCommandLine( int argc, char *const argv[] )
@@ -403,7 +185,7 @@ class SmpCommandLine
         {
             arguments.push_back( argv[i] );
         }
-
+        
         // Expand the combined single flags (e.g.: '-xzvf' expland to -x -z -v -f)
         for( int i = 0; i < arguments.size(); i++ ) 
         {
@@ -428,6 +210,7 @@ class SmpCommandLine
 
         mbWarningHasShown = false;
         mbHelpMsgHasShown = false;
+        mbUnflaggedApiCalled = false;
         maxUnflaggedArgs = 0;
 
         // Bonus extension: show version info of SmpCommandLine(this module, not client software)
@@ -812,6 +595,233 @@ class SmpCommandLine
     {
         std::cout << _VERSION_NUMBER_ << std::endl;
     }
+
+  //-----------------------------------------------------------------------------------------------
+  // Below are private / protected members:
+  protected:
+    const char hyphenchar = '-';
+    const std::string singleHyphen = std::string("-");
+    const std::string doubleHyphen = std::string("--");
+    const std::string emptyString  = std::string("");
+    const bool        bQuitOnError = false;
+
+    std::vector<std::string> arguments;
+    std::vector<std::string> helpMessageQueue;
+    std::string firstLineFlagMsg;
+    int  maxUnflaggedArgs;
+    bool mbWarningHasShown;
+    bool mbHelpMsgHasShown;
+    bool mbUnflaggedApiCalled;
+
+  protected:
+
+    std::string bool2String( bool torf )
+    {
+        if( torf )
+            return( std::string("true") );
+        else
+            return( std::string("false") );
+    };
+
+    bool string2Bool( std::string boolName, bool defaultValue = false, int *pErrorCode = NULL )
+    {
+        if( !boolName.empty() ) 
+        {
+            std::string argInLower;
+
+            std::transform( boolName.begin(), boolName.end(), 
+                            argInLower.begin(), [](unsigned char c){ return std::tolower(c); } );
+
+            if( argInLower == std::string("no")   || argInLower == std::string("n") || 
+                argInLower == std::string("false")|| argInLower == std::string("f") ) 
+            {
+                if( pErrorCode != NULL )
+                    pErrorCode = 0;
+                return( false );
+            } 
+            else if( argInLower == std::string("yes")  || argInLower == std::string("y") || 
+                     argInLower == std::string("true") || argInLower == std::string("t") ) 
+            {
+                if( pErrorCode != NULL )
+                   *pErrorCode = 0;
+                return( true );
+            } 
+            else 
+            {    
+                if( pErrorCode != NULL )
+                   *pErrorCode = -1;
+                return( defaultValue );
+            }
+        } 
+        else 
+        { 
+            if( pErrorCode != NULL )
+               *pErrorCode = -1;
+            return( defaultValue );
+        }
+    };
+
+    std::string getFlaggedArgument( const char* shortFlag, const char* longFlag, bool bFlagOnly=false )
+    {
+        if( mbUnflaggedApiCalled ) {
+            _ERROR_MESSAGE( "WARNING!: Please extract all flagged arguments before extracting unflagged argument!" );
+        }
+
+        if( shortFlag == NULL && longFlag == NULL ) {
+            _ERROR_MESSAGE( "Source usage error: shortFlag and longFlag can not both be NULL!");
+            
+            if( bQuitOnError ) 
+                exit(-1);
+            else
+                return( emptyString );
+        }
+
+        std::string shortFlagStr;
+        std::string longFlagStr;
+
+        if( shortFlag != NULL )
+        {
+            if( shortFlag[0] != hyphenchar ) {
+                shortFlagStr = singleHyphen + shortFlag;
+            } else {
+                shortFlagStr = std::string(shortFlag);
+            }
+        }
+
+        if( longFlag != NULL )
+        {
+            if( longFlag[0] != hyphenchar ) {
+                longFlagStr = doubleHyphen + longFlag;
+            } else {
+                longFlagStr = std::string(longFlag);
+            }
+
+            if( longFlag[0] == hyphenchar && longFlag[1] != hyphenchar ) {
+                // ERROR: User has specified a wrong format of longFlag:
+                _ERROR_MESSAGE( "In %s(), illegal format of long flag in calling. \
+                        (use double hyphen '--flag' or no hyphen 'flag' for long flags", __FUNCTION__ );
+                if( bQuitOnError ) {
+                    exit(-1);
+                } else {
+                    return( emptyString );
+                }
+            }
+        }
+
+        for( int i = 0; i < arguments.size(); i++ )
+        {
+            //std::cout << "i="<<i<<" "<<arguments[i] << " vs " << singleHyphen + shortFlag << std::endl;
+            if( ( shortFlag != NULL && arguments[i] == shortFlagStr ) || 
+                 ( longFlag != NULL && arguments[i] == longFlagStr ) )
+            {
+                arguments.erase( arguments.begin()+i );
+
+                if( !bFlagOnly && i < arguments.size() && !arguments[i].empty() ) {
+                    std::string valueString = arguments[i];
+                    arguments.erase( arguments.begin()+i );
+                    return( valueString );
+                } else {
+                    return(std::string(" "));
+                }
+                i--; // important!!
+            }
+        }
+        //_DEBUG_MESSAGE( "%s: flag:%s, returns empty string.\n", __FUNCTION__, 
+        //               (shortFlag!=NULL? shortFlag : longFlag) );
+        return( emptyString );
+    };
+
+    std::string getUnflaggedArgument( int index )
+    {   
+        mbUnflaggedApiCalled = true;
+        
+        if( index > maxUnflaggedArgs )
+            maxUnflaggedArgs = index;
+
+        for( int i = 0, pi = 0; i < arguments.size(); i++ )
+        {
+            if( arguments[i][0] == '-' )
+            {
+                if( !mbWarningHasShown && arguments[i] != std::string("-h") && arguments[i] != std::string("--help") ) {
+                    _ERROR_MESSAGE ("WARNING! There may be unknown flags in the command line, or in source code you have extracted\n" ); 
+                    _ERROR_MESSAGE ("         unflagged arguments before extracting all the flagged ones (i.e. argument with leading\n" );
+                    _ERROR_MESSAGE ("         '-' or '--' sign). Please make sure to extract common arguments after extracting \n" );
+                    _ERROR_MESSAGE ("         all flagged arguments in source code.\n");
+                    _ERROR_MESSAGE ("         Consult the readme description in SmpCommandLine.hpp for details.\n");
+                    mbWarningHasShown = true;
+                }
+            } 
+            else 
+            {
+                if( pi == index ) {
+                    return( arguments[i] );
+                } else { 
+                    pi++;
+                }
+            }
+        }
+        return(emptyString);
+    };
+
+    void addHelpMessage( const char* shortFlag, const char* longFlag, const std::string defaultStr, 
+                         const char* helpMsg, bool bFlagOnly = false )
+    {
+        // Constuct help message for this item:
+        std::string helpStr;
+
+        if( shortFlag != NULL ) {
+            std::string shortFlagStr(shortFlag); 
+
+            if( shortFlagStr[0] != hyphenchar ) {
+                shortFlagStr = singleHyphen + shortFlag;
+            }
+            helpStr = helpStr + shortFlagStr;
+        }
+
+        if( shortFlag != NULL && longFlag != NULL ) {
+            helpStr = helpStr + "/";
+        }
+
+        if( longFlag != NULL ) {
+            std::string longFlagStr(longFlag);
+
+            if( longFlagStr[0] != hyphenchar ) {
+                longFlagStr = doubleHyphen + longFlag;
+            }
+            helpStr = helpStr + longFlagStr;
+        }
+
+        if( !bFlagOnly )
+            helpStr = helpStr + " val";
+
+        // Add info to the first line of help message:
+        firstLineFlagMsg += "["+helpStr+"] ";
+        
+        helpStr = helpStr + " : ";
+        helpStr = helpStr + helpMsg;
+        
+        if( !defaultStr.empty() )
+            helpStr = helpStr + " (defualt value:" + defaultStr + ")";
+        
+        helpMessageQueue.push_back(helpStr);
+    };
+
+    void addHelpMessage( int index, const std::string defaultStr, const char* helpMsg )
+    {
+        std::string helpStr;
+
+        helpStr = helpStr + "argument" + std::to_string(index) + ": ";
+        helpStr = helpStr + helpMsg;
+
+        if( !defaultStr.empty() )
+            helpStr = helpStr + " (defualt value: " + defaultStr + ")";
+        
+        helpMessageQueue.push_back(helpStr);
+    };
+
+    // Forbid calling of default constructor (force user to pass argc and argv into constructor method
+    // (defined below):
+    SmpCommandLine(){};
 }; 
 
 #endif //__SMP_COMMAND_LINE_HPP__
