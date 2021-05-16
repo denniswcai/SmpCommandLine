@@ -1,4 +1,5 @@
-# SmpCommandLine is a light-weight header-file-only c++ package for user command line parsing and extraction.
+# SmpCommandLine 
+## is a light-weight header-file-only c++ package for user command line parsing and extraction.
 
     (For a qucik reference of usage, you may check the example codes in SmpCommandLine_Demo.cpp)
   
