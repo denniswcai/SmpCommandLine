@@ -3,7 +3,8 @@
 
     (For a qucik reference of usage, you may check the example codes in SmpCommandLine_Demo.cpp)
   
-  ## In command line, arguments provided by user are separated by space. In general, there are two 
+  ## Prior knowledge 
+    In command line, arguments provided by user are separated by space. In general, there are two 
     kinds of arguments in command line: Flagged Arguments and Unflagged Arguments. A Flagged 
     Argument could start with a hyphen sign and a conjuncted character (eg: -n), which is referred
     to as short flag, or, start with double hyphen signs with a string (e.g.: --image_name), 
