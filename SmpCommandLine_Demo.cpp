@@ -17,6 +17,7 @@ int main( int argc, char *argv[] )
     double radius = userCommands.getDouble( "r", "radius", double(6750.0), "the radius of the shpere" ); 
     bool bShowImage = userCommands.getBoolean( "s", "show_image", CMD_FLAG_ONLY, false, "whether display the image during processing" );
     string filterName = userCommands.getString( "f", "filter", "", "specifies an image effect filter" ); 
+ 
     // Then, extract unflagged arguments:
     std::string srcFileName = userCommands.getArgument( 1, "", "file name of the source image" );
     std::string tgtFileName = userCommands.getArgument( 2, "", "file name of the target image" );

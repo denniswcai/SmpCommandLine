@@ -663,8 +663,8 @@ class SmpCommandLine
 
     std::string getFlaggedArgument( const char* shortFlag, const char* longFlag, bool bFlagOnly=false )
     {
-        if( mbUnflaggedApiCalled ) {
-            _ERROR_MESSAGE( "WARNING!: Please extract all flagged arguments before extracting unflagged argument!" );
+        if( mbUnflaggedApiCalled && !bFlagOnly ) {
+            _ERROR_MESSAGE( "WARNING!: Please extract all flagged arguments before extracting unflagged argument!\n" );
         }
 
         if( shortFlag == NULL && longFlag == NULL ) {
