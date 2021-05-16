@@ -8,10 +8,12 @@
     to as short flag, or, start with double hyphen signs with a string (e.g.: --image_name), 
     which is referred to as long flag. The flag is usually followed by an argument giving the value
     of the specified field (e.g.: --image_name my_photo.jpg).
+    
   ## How to use this SmpCommadnLine.hpp:
     1) Include SmpCommandLine.hpp in your project's main c++ source file (the one with the main 
        fuctcion):
        #include "SmpCommandLine.hpp"
+    
     2) Make sure you have added "( int argc, char *argv[] )" in your main fucntion's input 
        parameter list, that is: 
        int main( int argc, char *argv[] ) 
@@ -28,22 +30,26 @@
        to extract an integer number led by a short flagged specified by 'shorFlag', or a long 
        flag specified by 'longFlag'. If none of the specified flags presents in the command line,
        the returned value of this method is set to the given 'defaultValue'.
+    
     5) Similiarly, call below member function of SmpCommandLine to extract different types of 
        value from command line:
            getFloat( shortFlag, longFlag...), to extract a float number with specified flag
            getDouble( shortFlag, longFlag...), to extract a double number with specified flag
            getString( shortFlag, longFlag...), to extract a string with specified flag. 
            getBoolean( shortFlag, longFlag...), to extract a boolean with specified flag. 
+    
     6) Take notes to the 'getBoolean()' method. There are two types of command line formats for 
        boolean value, one is simply using a flag (e.g. -b), the present of that flag in command
        line sets the associated boolean value to true; the other format is to use a flag followed by  
        a text boolean name, explicitly setting the boolean to yes/no (or true/false), (e.g.: -b yes, 
        -b false). By default, we use the formal format, namely CMD_FLAG_ONLY, unless it is clearly
        specified by giving a 'CMD_WITH_VALUE' (of type SmpCommandType) in the call to getBoolean().
+    
     7) Multipy boolean flags can be combined in one shortFlag starting with a single hythen in 
        command line (e.g.: '-xzvf', which is equalvalue to '-x -z -v -f'). Note in this case, the 
        boolean value should be in CMD_FLAG_ONLY format, except for the last flag which can be 
        followed by a value argument when needed.
+    
     8) After extracting all the flagged arguments from command line, you may call 
           getInteger( index, defaultValue, helpMsg )
           getFloat( index, defaultValue, helpMsg )
@@ -66,7 +72,7 @@
        the helpMsg strings provided in the above calls to getArgument(..., helpMsg ).
   
   ## IMPORTANT NOTES: 
-       Please make sure you call getXxxxx( shortFlag, longFlag, ... ) to extract all flagged 
+    Please make sure you call getXxxxx( shortFlag, longFlag, ... ) to extract all flagged 
     arguments before calling getXxxx( index, ... ) to extract unflagged arguments, or the you may 
     extract unexpected argument when calling getXxxx( index, ... ). 
     A bit more notes:
