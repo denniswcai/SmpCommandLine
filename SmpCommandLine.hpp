@@ -127,7 +127,9 @@ class SmpCommandLine
 
     SmpCommandLine( int argc, char *const argv[] )
     {
-        for( int i = 0; i < argc; i++ )
+        mArgCount = argc;
+
+        for( int i = 0; i < mArgCount; i++ )
         {
             arguments.push_back( argv[i] );
         }
@@ -170,7 +172,7 @@ class SmpCommandLine
         }
     };
 
-    // Extract FLAGGED argument of int type
+    // Extract flagged argument of int type
     int getInteger( const char* shortFlag, const char* longFlag, int defaultValue = 0, const char* helpMsg = "" )
     {
         addHelpMessage( shortFlag, longFlag, std::to_string(defaultValue), helpMsg );
@@ -198,7 +200,7 @@ class SmpCommandLine
         }
     };
 
-    // Extract UNFLAGGED argument of int type
+    // Extract unflagged argument of int type
     int getInteger( int index, int defaultValue = 0, const char* helpMsg = "" )
     {   
         addHelpMessage( index, std::to_string(defaultValue), helpMsg );
@@ -226,7 +228,7 @@ class SmpCommandLine
         }
     };
 
-    // Extract FLAGGED argument of flat type
+    // Extract flagged argument of flat type
     float getFloat( const char* shortFlag, const char* longFlag, float defaultValue = 0.0, const char* helpMsg = "" )
     {
         addHelpMessage( shortFlag, longFlag, std::to_string(defaultValue), helpMsg );
@@ -257,7 +259,7 @@ class SmpCommandLine
         }
     };
 
-    // Extract UNFLAGGED argument of flat type
+    // Extract unflagged argument of flat type
     float getFloat( int index, float defaultValue = 0.0, const char* helpMsg = "" )
     {
         addHelpMessage( index, std::to_string(defaultValue), helpMsg );
@@ -287,7 +289,7 @@ class SmpCommandLine
         }
     };
 
-    // Extract FLAGGED argument of double type
+    // Extract flagged argument of double type
     double getDouble( const char* shortFlag, const char* longFlag, double defaultValue = 0.0, const char* helpMsg = "" )
     {
         addHelpMessage( shortFlag, longFlag, std::to_string(defaultValue), helpMsg );
@@ -317,7 +319,7 @@ class SmpCommandLine
         }
     };
 
-    // Extract UNFLAGGED argument of double type
+    // Extract unflagged argument of double type
     double getDouble( int index, double defaultValue = 0.0, const char* helpMsg = "" )
     {
         addHelpMessage( index, std::to_string(defaultValue), helpMsg );
@@ -346,7 +348,7 @@ class SmpCommandLine
         }
     };
 
-    // Extract FLAGGED argument of bealean type
+    // Extract flagged argument of bealean type
     bool getBoolean( const char* shortFlag, const char* longFlag, SmpCommandType cmdType = CMD_FLAG_ONLY , bool defaultValue = false, const char* helpMsg = "" )
     {
         if( cmdType==CMD_FLAG_ONLY && defaultValue )
@@ -386,7 +388,7 @@ class SmpCommandLine
     };
 
 
-    // Extract UNFLAGGED argument of boolean type
+    // Extract unflagged argument of boolean type
     bool getBoolean( int index, bool defaultValue=false, const char* helpMsg = "" )
     {   
         addHelpMessage( index, bool2String(defaultValue), helpMsg );
@@ -411,7 +413,7 @@ class SmpCommandLine
         }
     };
 
-    // Extract FLAGGED argument of string type
+    // Extract flagged argument of string type
     std::string getString( const char* shortFlag, const char* longFlag, std::string defaultValue = "", const char* helpMsg = "" )
     {
         addHelpMessage( shortFlag, longFlag, defaultValue, helpMsg );
@@ -424,7 +426,7 @@ class SmpCommandLine
             return( defaultValue );
     };
 
-    // Extract UNFLAGGED argument of string type
+    // Extract unflagged argument of string type
     std::string getString( int index, std::string defaultValue = "", const char* helpMsg = "" )
     {   
         addHelpMessage( index, defaultValue, helpMsg );
@@ -504,10 +506,12 @@ class SmpCommandLine
         mbHelpMsgHasShown = true;
     };
 
-    bool helpMessageWanted()
+    bool helpMessageWanted( int minArgc = -1 )
     {
         // Handling help message trigers:
-        return( getBoolean( "h", "help", CMD_FLAG_ONLY, false, "Show this help message" ) );
+        bool bHelpMsgWanted = getBoolean( "h", "help", CMD_FLAG_ONLY, false, "Show this help message" );
+
+        return( bHelpMsgWanted || (minArgc > 0 && mArgCount < minArgc) );
     }
 
     void showHelpMsgOnRequest()
@@ -542,6 +546,7 @@ class SmpCommandLine
         std::cout << _VERSION_NUMBER_ << std::endl;
     }
 
+
   //-----------------------------------------------------------------------------------------------
   // Below are private / protected members:
   protected:
@@ -554,6 +559,7 @@ class SmpCommandLine
     std::vector<std::string> arguments;
     std::vector<std::string> helpMessageQueue;
     std::string firstLineFlagMsg;
+    int  mArgCount;
     int  maxUnflaggedArgs;
     bool mbWarningHasShown;
     bool mbHelpMsgHasShown;
@@ -689,11 +695,9 @@ class SmpCommandLine
             if( arguments[i][0] == '-' )
             {
                 if( !mbWarningHasShown && arguments[i] != std::string("-h") && arguments[i] != std::string("--help") ) {
-                    _ERROR_MESSAGE ("WARNING! There may be unknown flags in the command line, or in source code you have extracted\n" ); 
-                    _ERROR_MESSAGE ("         unflagged arguments before extracting all the flagged ones (i.e. argument with leading\n" );
-                    _ERROR_MESSAGE ("         '-' or '--' sign). Please make sure to extract common arguments after extracting \n" );
-                    _ERROR_MESSAGE ("         all flagged arguments in source code.\n");
-                    _ERROR_MESSAGE ("         Consult the readme description in SmpCommandLine.hpp for details.\n");
+                    _DEBUG_MESSAGE ("WARNING! There may be unknown flags in the command line, or in source code you have extracted\n" ); 
+                    _DEBUG_MESSAGE ("         unflagged arguments before extracting all the flagged ones.\n");
+                    _DEBUG_MESSAGE ("         Consult the readme description in SmpCommandLine.hpp for details.\n");
                     mbWarningHasShown = true;
                 }
             } 

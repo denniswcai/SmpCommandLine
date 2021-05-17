@@ -23,7 +23,7 @@ int main( int argc, char *argv[] )
     std::string tgtFileName = userCommands.getArgument( 2, "", "file name of the target image" );
 
     // Check whether need to show help message:
-    if( userCommands.helpMessageWanted() || argc < 3 ) {
+    if( userCommands.helpMessageWanted( 3 ) ) {  
         userCommands.showHelpMessage();
     }
 
