@@ -6,7 +6,7 @@
   ## SmpCommandLine is a light-weight header-file-only c++ tool for user command line parsing 
     and argument extraction.
 
-  ## NOTE: For a qucik reference of usage, you may directly check the example codes in 
+  ## NOTE: For a quick reference of usage, you may directly check the example codes in 
     SmpCommandLine_Demo.cpp
    
   ## Terminology: In command line, arguments provided by user are separated by space. In general, 
