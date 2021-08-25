@@ -4,7 +4,7 @@
 // Compile: $ g++ SmpCommandLine_Demo.cpp -o my_program
 // Run: $./my_program ...
 
-#include "./SmpCommandLine.hpp"  
+#include "SmpCommandLine.hpp"  
 
 using namespace std;
 
