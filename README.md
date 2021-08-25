@@ -1,18 +1,19 @@
-### SmpCommandLine V2.0.0
-#   Date:2021/08/25
+# SmpCommandLine V2.0.0
+###   Date:2021/08/25
 
-### Descriptions: 
+# Descriptions: 
 
-  # SmpCommandLine is a light-weight header-file-only c++ tool for user command line parsing 
+  ## SmpCommandLine is a light-weight header-file-only c++ tool for user command line parsing 
     and argument extraction.
 
-  # NOTE: For a qucik reference of usage, you may directly check the example codes in 
+  ## NOTE: For a quick reference of usage, you may directly check the example codes in 
     SmpCommandLine_Demo.cpp
    
-  # Terminology: In command line, arguments provided by user are separated by space. In general, 
-    there are two kinds of arguments in command line, namely, Flagged Arguments and Unflagged 
-    Arguments. A Flagged Argument starts either with a hyphen sign and one conjuncted character 
-    (eg: -n), which is referred to as short flag, or, starts with double hyphen signs and a string 
+  ## A bit Terminologies: 
+    In command line, arguments provided by user are separated by space. In general, there are two 
+    kinds of arguments in command line, namely, Flagged Arguments and Unflagged Arguments. 
+    A Flagged Argument starts either with a hyphen sign and one conjuncted character (eg: -n), 
+    which is referred to as short flag, or, starts with double hyphen signs and a string 
     (e.g.: --image_name), which is referred to as long flag. In most of case, a flag is followed 
     by an argument which gives the value of the specified field (e.g.: --image_name my_photo.jpg),
     Except for boolean argument, which comes with a flag only and no value part followed.
@@ -25,7 +26,7 @@
     are flagged argument, where, '--filter' are long flag, others are short flag. And, '-s' is a 
     boolean argument.
 
-  # How to use this SmpCommadnLine.hpp:
+  ## How to use this SmpCommadnLine.hpp:
 
     1) Include SmpCommandLine.hpp in your project's main c++ source file (the one with the main 
        fuctcion), like:
@@ -107,7 +108,7 @@
        automatically composed from the helpMsg strings provided in the above calls to 
        getArgument(..., helpMsg ).
 
-  # IMPORTANT NOTES: 
+  ## IMPORTANT NOTES: 
 
     1) Please make sure you call getXxxxx( shortFlag, longFlag, ... ) to extract all flagged 
        arguments before calling getXxxx( index, ... ) to extract unflagged arguments, or the you may 
@@ -124,5 +125,4 @@
       number.
     * string argument cannot contain any non-printable characters.
 
-  # Examples Codes could be found in SmpCommandLine_Demo.cpp
-###
+  ## Examples Codes could be found in SmpCommandLine_Demo.cpp
