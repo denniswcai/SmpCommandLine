@@ -9,10 +9,11 @@
   ## NOTE: For a quick reference of usage, you may directly check the example codes in 
     SmpCommandLine_Demo.cpp
    
-  ## Terminology: In command line, arguments provided by user are separated by space. In general, 
-    there are two kinds of arguments in command line, namely, Flagged Arguments and Unflagged 
-    Arguments. A Flagged Argument starts either with a hyphen sign and one conjuncted character 
-    (eg: -n), which is referred to as short flag, or, starts with double hyphen signs and a string 
+  ## A bit Terminologies: 
+    In command line, arguments provided by user are separated by space. In general, there are two 
+    kinds of arguments in command line, namely, Flagged Arguments and Unflagged Arguments. 
+    A Flagged Argument starts either with a hyphen sign and one conjuncted character (eg: -n), 
+    which is referred to as short flag, or, starts with double hyphen signs and a string 
     (e.g.: --image_name), which is referred to as long flag. In most of case, a flag is followed 
     by an argument which gives the value of the specified field (e.g.: --image_name my_photo.jpg),
     Except for boolean argument, which comes with a flag only and no value part followed.
