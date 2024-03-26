@@ -5,8 +5,7 @@ Date:2021/08/25
 
   ### SmpCommandLine is a light-weight header-file-only c++ tool for user command line parsing and argument extraction.
 
-  ### NOTE: For a quick reference of usage, you may directly check the example codes in 
-    SmpCommandLine_Demo.cpp
+  ### NOTE: For a quick reference of usage, you may directly check the example codes in  SmpCommandLine_Demo.cpp
    
   ### A bit Terminologies: 
     In command line, arguments provided by user are separated by spaces. And, in general, there are  
@@ -14,8 +13,8 @@ Date:2021/08/25
     
     A flagged argument could either start with a single hyphen sign followed immediately by one 
     single character specifying the name of the short flag, (eg: -n), or it could start with a 
-    double hyphen followed by a string of characters (e.g.: --image_name), which is referred to as
-   long flag. 
+    double hyphen followed by a string of characters (e.g.: --image_name), which is referred to as 
+    long flag. 
     
     In most of the cases, a flag is then followed by an argument which gives the value of that 
     specific field (e.g.: --image_name my_photo.jpg), Except for boolean argument, which comes with 
@@ -26,9 +25,8 @@ Date:2021/08/25
 
     Below gives an example of command line:
 
-        <code>
-        ./my_program inputphoto.jpg -o outputphoto.jpg --filter gaussion -w 1024 -h 768 -b 
-        </code>
+        `./my_program inputphoto.jpg -o outputphoto.jpg --filter gaussion -w 1024 -h 768 -b `
+        
     
     In the above examples, 'inputphoto.jpg' is an unflagged argument, the rest in the command line
     are flagged argument, where, '--filter' are long flag, others are short flag. And, '-b' is a 
