@@ -133,13 +133,20 @@ Date:2021/08/25
          {
             SmpCommandLine commands(argc, argv); 
             
-            int imageWidth    = commands.getInteger("w", "--width", 1024, "giving the width of image");
-            int imageHeight   = commands.getInteger("h", "--height", 768, "giving the height of image");
-            string outputName = commands.getString( "o", "--output", output.jpg, "specify the output image filename");
+            int imageWidth    = commands.getInteger("w", "--width", 1024, "give the width of image");
+            int imageHeight   = commands.getInteger("h", "--height", 768, "give the height of image");
+            bool bShowImage   = commands.getBoolean("s", "show_image", "show image on screen during processing");
+            string outputName = commands.getString( "o", "--output", "output.jpg", "specify the output image filename");
             // place this type of method at after above methord:
-            string inputName  = commands.getString( 1, "input.jpg, "specify the input image filename");
+            string inputName  = commands.getString( 1, "input.jpg", "specify the input image filename");
             //...
+         }
          </code>
+      And, when user types, e.g.
+        <code>
+         ./my_program my_photo.jpg -o new_photo.jpg -w 400, -h 300, -s
+        </code>
+      the variable in the above codes in main() will be set respectively.
 
     9) (For user who type command lines), in this version, when typing command line, please always
        add a space to sperate a flag and its following value. e.g., this is good: 
