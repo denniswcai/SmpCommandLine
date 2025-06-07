@@ -1,12 +1,12 @@
 # SmpCommandLine V2.1.0
 ## Descriptions: 
-  # SmpCommandLine is a light-weight header-file-only c++ tool for user command line parsing 
+  ### SmpCommandLine is a light-weight header-file-only c++ tool for user command line parsing 
     and argument extraction.
 
-  # NOTE: For a qucik reference of usage, you may directly check the example codes in 
+  ### NOTE: For a qucik reference of usage, you may directly check the example codes in 
     SmpCommandLine_Demo.cpp
    
-  # Background & Terminologies: 
+  ## Background & Terminologies: 
     Command Line is a simple way for user to provide input commands to launch and control computer
 	programs through character interface like a Terminal. For example, below command line launches
 	a program named 'my_program' with a serial of arguments:
@@ -28,7 +28,7 @@
 	If a Flagged Argument is used to provide a boolean argument, the parameter can be obmitted. 
 	e.g., "-s" in above example.
 
-  # Usage of SmpCommadnLine.hpp:
+  ## Usage of SmpCommadnLine.hpp:
 
     1) Include SmpCommandLine.hpp in your project's main c++ source file (the one with the main 
        fuctcion), and make sure you have added the input argument phrase in the main function's
@@ -111,7 +111,7 @@
        automatically composed from the helpMsg strings provided in the above calls to 
        getArgument(..., helpMsg ).
 
-  # IMPORTANT NOTES: 
+  ## IMPORTANT NOTES: 
 
     1) Please make sure you call getXxxxx( shortFlag, longFlag, ... ) to extract ALL Flagged 
        Arguments before calling getXxxx( index, ... ) to extract any Unflagged Arguments, or the
@@ -128,6 +128,6 @@
 	  as start a flag.
     * string argument cannot contain any non-printable characters.
 
-  # Examples of Usage
+  ## Examples of Usage
    	Example codes could be found in SmpCommandLine_Demo.cpp
   
