@@ -1,6 +1,6 @@
 //
 // SmpCommandLine.hpp
-// Dennis @ 2021-08, V2.0
+// Dennis @ 2021-2025, V2.1
 
 /* 
 ### Descriptions: SmpCommandLine
@@ -11,33 +11,41 @@
   # NOTE: For a qucik reference of usage, you may directly check the example codes in 
     SmpCommandLine_Demo.cpp
    
-  # Terminology: In command line, arguments provided by user are separated by space. In general, 
-    there are two kinds of arguments in command line, namely, Flagged Arguments and Unflagged 
-    Arguments. A Flagged Argument starts either with a hyphen sign and one conjuncted character 
-    (eg: -n), which is referred to as short flag, or, starts with double hyphen signs and a string 
-    (e.g.: --image_name), which is referred to as long flag. In most of case, a flag is followed 
-    by an argument which gives the value of the specified field (e.g.: --image_name my_photo.jpg),
-    Except for boolean argument, which comes with a flag only and no value part followed.
+  # Background & Terminologies: 
+    Command Line is a simple way for user to provide input commands to launch and control computer
+	programs through character interface like a Terminal. For example, below command line launches
+	a program named 'my_program' with a serial of arguments:
+	
+	   ./my_program input_photo.jpg -o output_photo.jpg --filter gaussion -w 1024 -h 768 -s 
+	   
+	In command line, arguments provided by user are separated by space. In general, there are two 
+	kinds of arguments, namely, Unflagged Arguments and Flagged Arguments. An Unflagged Argument
+	is just a textual parameter (a textual string or a number) directly given in the command line. 
+	e.g., "input_photo.jpg" in the above example. 
 
-    Below gives an example of command line:
+	A Flagged Argument specifies the argument name by a flag and then the parameter. There are two
+	commonly used versions of Flagged Arguments: concised(short) version and full(long) version. 
+	A concised version of Flagged Argument starts with a hyphen sign followed by one conjuncted
+	character, and then a parameter. e.g., "-o output_photo.jpg" in the above example. A full 
+	version of Flagged Argument starts with a double-hyphen sign followed by a flag name (a word), 
+	and then the parameter, e.g., "--filter guassion" in above example.
+	
+	If a Flagged Argument is used to provide a boolean argument, the parameter can be obmitted. 
+	e.g., "-s" in above example.
 
-        ./my_program inputphoto.jpg -o outputphoto.jpg --filter gaussion -w 1024 -h 768 -s 
-    
-    In the above examples, 'inputphoto.jpg' is an unflagged argument, the rest in the command line
-    are flagged argument, where, '--filter' are long flag, others are short flag. And, '-s' is a 
-    boolean argument.
-
-  # How to use this SmpCommadnLine.hpp:
+  # Usage of SmpCommadnLine.hpp:
 
     1) Include SmpCommandLine.hpp in your project's main c++ source file (the one with the main 
-       fuctcion), like:
+       fuctcion), and make sure you have added the input argument phrase in the main function's
+	   argument list, like:
 
         #include "SmpCommandLine.hpp"
         //...
+		int main( int argc, char *argv[] )
+		//...
 
-    2) Make sure you have added the input argument phrase "( int argc, char *argv[] )" in your main
-       fucntion's argument list. And, create a SmpCommandLine object at the top of the main(...) 
-       function, with the 'argc' and 'argv' as constuctor's parameter, that is:
+    2) Create a SmpCommandLine object at the top of the main(...) function, with the 'argc' and
+	   'argv' as constuctor's parameter, that is:
        
         int main( int argc, char *argv[] ) 
         {
@@ -51,12 +59,13 @@
 
        The prototype of this method is: 
            
-            int SmpCommandLine::getInteger( const char* shortflag, const char * longflag, 
-                                            int defaultValue, std::string helpMessage);
+            int SmpCommandLine::getInteger( const char* shortflag, const char* longflag, 
+                                            int defaultValue, std::string helpMessage );
        
-       This method extracts an integer number led by a short flagged (in this case, '-w'), or a 
-       long flag (int this case, --width). If none of the specified flags presents in the user 
-       command line, the returned value is set to the given 'defaultValue'.
+       This method extracts an integer number led by a short flagged (i.e. concised version of flag,
+	   in this case, '-w'), or a long flag (i.e. full version of flag, int this case, --width). If
+	   none of the specified flags presents in the user's command line, the returned value is set to
+	   the given 'defaultValue'.
 
     4) Similiarly, you may call below member function of SmpCommandLine to extract other types of 
        value from command line:
@@ -68,7 +77,7 @@
 
     5) A special note to the getBoolean( shortFlag, longFlag,...) method: In this version, boolean 
        arguments are "flag-only" argument, which means that, in user command line, boolean arguments
-       consist of a flag only, but with no value follows behind. for example, below are boolean 
+       consist of a flag only, but with no parameter follows behind. for example, below are boolean 
        arguments in user command line:
 
             ./some_program -x -z -v
@@ -76,13 +85,11 @@
        when calls 
             bool x = getBoolean( "x", NULL, "" );
     
-       The boolean value 'x' will be set to true. Please also note that, the default value of boolean 
-       argument is always false.
+       The boolean value 'x' will be set to true(yes). Please also note that, the default value of 
+	   boolean argument is always false.
 
-    6) Multipy boolean flags can be combined in one shortFlag starting with a single hythen in 
-       command line (e.g.: "zip -xzv", which is equalvalue to "zip -x -z -v"). 
 
-    7) After extracting all the flagged arguments from command line, you may call 
+    6) After extracting all the flagged arguments from command line, you may call 
 
             getInteger( index, defaultValue, helpMsg )
             getFloat( index, defaultValue, helpMsg )
@@ -99,7 +106,7 @@
        getString( 1, ... ) returns 'input_file.jpg', and
        getString( 2, ... ) returns 'output_file.jpg' 
       
-    8) Finally, if necessary, call below piece of codes to show help message to user, when it is 
+    7) Finally, if necessary, call below piece of codes to show help message to user, when it is 
        wanted:
 
             if( userCommands.helpMessageWanted() )
@@ -111,9 +118,9 @@
 
   # IMPORTANT NOTES: 
 
-    1) Please make sure you call getXxxxx( shortFlag, longFlag, ... ) to extract all flagged 
-       arguments before calling getXxxx( index, ... ) to extract unflagged arguments, or the you may 
-       extract unexpected argument when calling getXxxx( index, ... ). 
+    1) Please make sure you call getXxxxx( shortFlag, longFlag, ... ) to extract ALL Flagged 
+       Arguments before calling getXxxx( index, ... ) to extract any Unflagged Arguments, or the
+	   you may extract unexpected argument when calling getXxxx( index, ... ). 
 
     2) (For user who type command lines), in this version, when typing command line, please always
        add a space to sperate a flag and its following value. e.g., this is good: 
@@ -122,16 +129,17 @@
             -w1920
 
     A bit more notes:
-    * Flags should start with a alphabet ranging from 'a'~'z' or 'A'~'Z', they can not start with a
-      number.
+    * Flags should start with a alphabet ranging from 'a'~'z' or 'A'~'Z', please don't use number to 
+	  as start a flag.
     * string argument cannot contain any non-printable characters.
 
-  # Examples Codes could be found in SmpCommandLine_Demo.cpp
+  # Examples of Usage
+   	Example codes could be found in SmpCommandLine_Demo.cpp
 ###
 */
 
-#ifndef __SMP_COMMAND_LINE_HPP__
-#define __SMP_COMMAND_LINE_HPP__
+#pragma once
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -154,7 +162,7 @@
 class SmpCommandLine 
 {
   private:
-    const std::string _VERSION_NUMBER_ = "SmpCommandLine V2.0.0, Dennis @ 2021-08";
+    const std::string _VERSION_NUMBER_ = "SmpCommandLine V2.1.0, Dennis @ 2021-2025";
   
   protected:
     const char kHyphenchar = '-';
@@ -774,7 +782,13 @@ class SmpCommandLine
 
     // Forbid calling of default constructor (force user to pass argc and argv into constructor method
     // (defined below):
-    SmpCommandLine(){};
+    SmpCommandLine(){
+        int  mArgCount = 0 ;
+        int  maxUnflaggedArgs = 0;
+        bool mbWarningHasShown = false;
+        bool mbHelpMsgHasShown = false;
+        bool mbUnflaggedApiCalled = false;
+    };
 }; 
 
-#endif //__SMP_COMMAND_LINE_HPP__
+
